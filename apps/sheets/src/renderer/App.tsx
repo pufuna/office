@@ -148,6 +148,7 @@ import {
   withAttachedSkills,
   type AgentImage,
 } from '@genoffice/agent-core'
+import { createDriveCalcSkill, pagedTextReader } from '@genoffice/drive-calc/agent-skill'
 import { imageGenerationAvailable, type AiSettings } from '@genoffice/ai-provider/browser'
 import { type WorkbookOperation } from '@genoffice/xlsx-gateway/domain/workbook-dsl'
 import {
@@ -1502,6 +1503,12 @@ export function App({
           },
         }),
         createSearchSkill(),
+        createDriveCalcSkill({
+          attachments: availableAttachments,
+          readAttachmentText: pagedTextReader((path, offset, max) =>
+            window.desktopApi.readAttachment(path, offset, max),
+          ),
+        }),
         createImageSkill(() =>
           imageGenerationAvailable(aiSettingsRef.current, gskLoggedInRef.current),
         ),

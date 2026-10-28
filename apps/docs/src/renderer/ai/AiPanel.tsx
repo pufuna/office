@@ -25,6 +25,7 @@ import {
   type KbFileInfo,
   type MindMapTreeNode,
 } from '@genoffice/agent-core'
+import { createDriveCalcSkill, pagedTextReader } from '@genoffice/drive-calc/agent-skill'
 import { redactTextBetween, type RedactableNode } from './redact-view'
 import { imageGenerationAvailable, mediaAnalysisAvailable } from '@genoffice/ai-provider/browser'
 import type { AiSettings, AttachmentAddResult, AttachmentMeta } from '../../shared/ipc'
@@ -862,6 +863,12 @@ export function AiPanel({
           () => mediaAnalysisAvailable(settingsRef.current, gskLoggedInRef.current),
         ),
         createFilesSkill(availableAttachments),
+        createDriveCalcSkill({
+          attachments: availableAttachments,
+          readAttachmentText: pagedTextReader((path, offset, max) =>
+            window.desktop.readAttachment(path, offset, max),
+          ),
+        }),
         createSkillsSkill(),
       ]),
       captureSnapshot: () => editorRef.current.getJSON() as PmNode,

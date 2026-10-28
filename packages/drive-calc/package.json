@@ -1,0 +1,25 @@
+{
+  "name": "@genoffice/drive-calc",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "description": "Variable-frequency drive engineering calculations (pufuna/raschet core): VFD selection, cables, harmonics, braking, energy saving, ESQ Service trends; AI agent skill and spreadsheet functions",
+  "exports": {
+    ".": "./src/index.ts",
+    "./agent-skill": "./src/agent-skill.ts"
+  },
+  "scripts": {
+    "sync-raschet": "node scripts/sync-raschet.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@genoffice/agent-core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
+  }
+}

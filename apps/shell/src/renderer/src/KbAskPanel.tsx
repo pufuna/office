@@ -16,6 +16,7 @@ import {
   type CreateDocumentFormat,
   type KbFileInfo,
 } from '@genoffice/agent-core'
+import { createDriveCalcSkill, pagedTextReader } from '@genoffice/drive-calc/agent-skill'
 import {
   AiComposer,
   AiModelPicker,
@@ -430,6 +431,12 @@ export function KbAskPanel({
         filesSkill,
         docSkill,
         cliSkill,
+        createDriveCalcSkill({
+          attachments: availableAttachments,
+          readAttachmentText: pagedTextReader((path, offset, max) =>
+            window.aiOffice.readAttachment(path, offset, max),
+          ),
+        }),
       ]),
       events: {
         onText: (text) => patchLast({ text }),

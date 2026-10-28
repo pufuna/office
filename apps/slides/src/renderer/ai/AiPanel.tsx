@@ -15,6 +15,7 @@ import {
   type AgentImage,
   type ToolDisplay,
 } from '@genoffice/agent-core'
+import { createDriveCalcSkill, pagedTextReader } from '@genoffice/drive-calc/agent-skill'
 import type { RenderSlide } from '@genoffice/pptx-render'
 import { imageGenerationAvailable, mediaAnalysisAvailable } from '@genoffice/ai-provider/browser'
 import type { AiSettings, AttachmentAddResult, AttachmentMeta } from '../../shared/ipc'
@@ -1370,6 +1371,12 @@ export function AiPanel({
       skill: composeSkills('slides+files', '', [
         createSlidesSkill(access),
         createFilesSkill(availableAttachments, (path) => readAttachmentPathsRef.current.add(path)),
+        createDriveCalcSkill({
+          attachments: availableAttachments,
+          readAttachmentText: pagedTextReader((path, offset, max) =>
+            window.desktop.readAttachment(path, offset, max),
+          ),
+        }),
       ]),
       events: {
         onText: (text) => {
