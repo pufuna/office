@@ -727,6 +727,24 @@ function pictureMarkLineFactor(latin: string | null, eastAsia: string | null): s
   return null
 }
 
+/**
+ * Height of the empty line a floating picture's anchor paragraph keeps in
+ * Word: the mark's font line (11pt Normal when unset) times an auto multiple,
+ * or the fixed exact / atLeast value.
+ */
+export function anchorParagraphLinePx(
+  markHalfPoints: number | null,
+  lineTwips: number | null,
+  lineRule: 'auto' | 'atLeast' | 'exact' | null,
+  fontFactor: string | null,
+): number {
+  const fontPx = ((markHalfPoints ?? 22) / 2) * (96 / 72)
+  const natural = fontPx * (Number(fontFactor) || 1.15)
+  if (lineTwips != null && lineRule === 'exact') return lineTwips / 15
+  if (lineTwips != null && lineRule === 'atLeast') return Math.max(lineTwips / 15, natural)
+  return natural * (cssAutoLineMult('auto', lineTwips ?? undefined, undefined) ?? 1)
+}
+
 type RunFactorRange = { from: number; to: number; style: string }
 
 /**
@@ -5592,6 +5610,20 @@ function protectedDomSpec(node: PmNode): DomSpec {
       // above editor chrome outside it (table handles, menus).
       const zi = imageWrap === 'behind' ? Math.min(-1, -1000 + z) : Math.max(1, 2 + z)
       const imgZIndexCss = `;z-index:${Math.round(zi)}`
+      // the anchor paragraph's own empty line (Word always lays it out); the
+      // wrapper stays zero-height except where a section break follows it
+      // (styles.css), so a section holding only a floating picture still
+      // occupies — and claims — its own page
+      const anchorLinePx = anchorParagraphLinePx(
+        node.attrs.imageMarkSizeHalfPoints as number | null,
+        node.attrs.imageParagraphLineTwips as number | null,
+        node.attrs.imageParagraphLineRule as 'auto' | 'atLeast' | 'exact' | null,
+        pictureMarkLineFactor(
+          node.attrs.imageMarkFont ? String(node.attrs.imageMarkFont) : null,
+          node.attrs.imageMarkFontEastAsia ? String(node.attrs.imageMarkFontEastAsia) : null,
+        ),
+      )
+      attrs.style = `${attrs.style ? `${attrs.style};` : ''}--doc-anchor-line:${anchorLinePx.toFixed(2)}px`
       const posH = node.attrs.imagePosH
       const tx =
         node.attrs.imageOffsetXEmu != null ? Number(node.attrs.imageOffsetXEmu) / EMU_PER_PX : 0

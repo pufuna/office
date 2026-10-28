@@ -6280,6 +6280,13 @@ body.docs-crop-active .doc-protected[data-doc-protected='image'] .doc-img-wrap {
   height: auto;
 }
 
+/* a floating picture whose anchor paragraph ends its section (a page-per-section
+   cover, scheme or drawing sheet): Word keeps that paragraph's empty line, so
+   the section occupies — and claims — its own page */
+.doc-protected.doc-img-float:not(.img-wrap-band):has(+ .doc-protected-sectbreak) {
+  height: var(--doc-anchor-line, 0px);
+}
+
 .doc-img-float > .doc-img-wrap {
   translate: 0 var(--page-float-dy, 0px);
 }
